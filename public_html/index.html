@@ -5,12 +5,12 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js"></script>
+    <script src="../main.js"></script>
     <!-- <link href="../css/fonts.css" rel="stylesheet" type="text/css" />
     <link href="../css/styles.css" rel="stylesheet" type="text/css" /> -->
     
     <script type="text/javascript">
         $(() => {
-            var my = {};
 
             // =================================================== Constructors ===================================================
             my.vm = function(t)  {
@@ -20,6 +20,7 @@
                 this.data = ko.observableArray([]);
                 this.isLoading = ko.observable(false);
                 this.symbolTitle = ko.observable('');
+                this.sampleData = ko.observable(my.dataService.getSampleData());
                 this.tickers = [{id: 1, symbol: 'VALE'}, 
                 {id: 2, symbol: 'MTTR'}, 
                 {id: 3, symbol: 'GM'}, 
@@ -135,13 +136,13 @@
                         <td data-bind='text: $data.volume'></td>
                     </tr>
                 </tbody>
-            </table>
-    
-            <!-- <div data-bind="text: ko.toJSON($data)"> -->
-                
+            </table>                
             </div>
         </div>
     </div>
+
+    <!-- <div data-bind="text: ko.toJSON($root.sampleData)"> -->
+
 
 
     <div class="d-flex justify-content-center" data-bind="if: isLoading">
