@@ -9,6 +9,7 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js"></script>
+    <script src="binding-handlers.js"></script>
     <script src="main.js"></script>
     <!-- <link href="../css/fonts.css" rel="stylesheet" type="text/css" />
     <link href="../css/styles.css" rel="stylesheet" type="text/css" /> -->
@@ -23,17 +24,19 @@
                     inputTicker = ko.observable(''),
                     data = ko.observableArray([]),
                     isLoading = ko.observable(false),
-                    symbolTitle = ko.observable(''),
                     sampleData = ko.observable(my.dataService.getSampleData()),
                     tickers = [{id: 1, symbol: 'VALE'}, 
                         {id: 2, symbol: 'MTTR'}, 
                         {id: 3, symbol: 'GM'}, 
                         {id: 4, symbol: 'BODY'}, 
                         {id: 5, symbol: 'SOFI'}],
-                    selectedTicker = ko.observable(tickers[0]),
+                    selectedTicker = ko.observable(tickers[1]),
+                    symbolTitle = ko.computed(() => {
+                        return inputTicker().toUpperCase();
+                    }),
                     url = ko.computed(() => {
                         return `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${selectedTicker().symbol}&apikey=TLLLXNFNDTE63G5H`;
-                    }, this),
+                    }),
                     createDailyPriceObservableAry = function(data) {
                         my.vmi.data.removeAll();
                         for (const key in data) {
@@ -48,12 +51,14 @@
                     searchTicker = function() {
                         let url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${inputTicker()}&apikey=TLLLXNFNDTE63G5H`;
                         $.get(url, (res) => {
-                        my.vmi.isLoading(true);
-                        my.vmi.symbolTitle(res['Meta Data']['2. Symbol'].toUpperCase());
-                        my.vmi.createDailyPriceObservableAry(res['Time Series (Daily)']);
-                    }).then(() => {
-                        my.vmi.isLoading(false)
-                    })
+                            my.vmi.isLoading(true);
+                            // my.vmi.symbolTitle(res['Meta Data']['2. Symbol'].toUpperCase());
+                            my.vmi.createDailyPriceObservableAry(res['Time Series (Daily)']);
+                        }).then(() => {
+                            my.vmi.isLoading(false)
+                        }).catch((err) => {
+                            console.log('err: ', err);
+                        })
                     }
                 return {
                     title: title,
@@ -87,9 +92,8 @@
             my.vmi = new my.vm('exclusive daily');
 
             // =================================================== initial data ===================================================
-            const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${my.vmi.selectedTicker().symbol}&apikey=TLLLXNFNDTE63G5H`;
+            var url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${my.vmi.selectedTicker().symbol}&apikey=TLLLXNFNDTE63G5H`;
             $.get(url, (res) => {
-                console.log(res);
                 my.vmi.isLoading(true);
                 let data = res['Time Series (Daily)'];
                 my.vmi.createDailyPriceObservableAry(data);
@@ -120,7 +124,7 @@
         <div class="container">
             <span data-bind="text: title"></span>
             <div>
-                <input data-bind="value: inputTicker, valueUpdate: 'afterkeydown'">
+                <input data-bind="value: inputTicker, enter: inputTicker">
                 <button data-bind="click: searchTicker">Search</button>
             </div>
             <br>
@@ -171,7 +175,7 @@
     </div>
 
     <!-- DEBUG -->
-    <div data-bind="text: ko.toJSON(selectedTicker)">
+    <!-- <div data-bind="text: ko.toJSON(selectedTicker)"> -->
 
     <!-- HighChart -->
     <!-- <script src="../custom-high-chart.js"></script> -->
