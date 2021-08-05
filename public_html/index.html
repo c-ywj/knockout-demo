@@ -18,44 +18,57 @@
 
             // =================================================== Constructors ===================================================
             my.vm = function(t)  {
-                this.title = ko.observable(t);
-                this.userFullName = ko.observable('c y');
-                this.inputTicker = ko.observable('');
-                this.data = ko.observableArray([]);
-                this.isLoading = ko.observable(false);
-                this.symbolTitle = ko.observable('');
-                this.sampleData = ko.observable(my.dataService.getSampleData());
-                this.tickers = [{id: 1, symbol: 'VALE'}, 
-                {id: 2, symbol: 'MTTR'}, 
-                {id: 3, symbol: 'GM'}, 
-                {id: 4, symbol: 'BODY'}, 
-                {id: 5, symbol: 'SOFI'}];
-                this.selectedTicker = ko.observable(this.tickers[0]);
-                this.url = ko.computed(() => {
-                    return `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${this.selectedTicker().symbol}&apikey=TLLLXNFNDTE63G5H`
-                }, this);
-                this.createDailyPriceObservableAry = function(data) {
-
-                    my.vmi.data.removeAll();
-                    for (const key in data) {
-                        my.vmi.data.push(new my.dailyPrice(key, 
-                        data[key]['2. high'],
-                        data[key]['3. low'],
-                        data[key]['1. open'],
-                        data[key]['4. close'],
-                        data[key]['5. volume']))
+                var title = ko.observable(t),
+                    userFullName = ko.observable('c y'),
+                    inputTicker = ko.observable(''),
+                    data = ko.observableArray([]),
+                    isLoading = ko.observable(false),
+                    symbolTitle = ko.observable(''),
+                    sampleData = ko.observable(my.dataService.getSampleData()),
+                    tickers = [{id: 1, symbol: 'VALE'}, 
+                        {id: 2, symbol: 'MTTR'}, 
+                        {id: 3, symbol: 'GM'}, 
+                        {id: 4, symbol: 'BODY'}, 
+                        {id: 5, symbol: 'SOFI'}],
+                    selectedTicker = ko.observable(tickers[0]),
+                    url = ko.computed(() => {
+                        return `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${selectedTicker().symbol}&apikey=TLLLXNFNDTE63G5H`;
+                    }, this),
+                    createDailyPriceObservableAry = function(data) {
+                        my.vmi.data.removeAll();
+                        for (const key in data) {
+                            my.vmi.data.push(new my.dailyPrice(key, 
+                            data[key]['2. high'],
+                            data[key]['3. low'],
+                            data[key]['1. open'],
+                            data[key]['4. close'],
+                            data[key]['5. volume']))
+                        }
+                    },
+                    searchTicker = function() {
+                        let url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${inputTicker()}&apikey=TLLLXNFNDTE63G5H`;
+                        $.get(url, (res) => {
+                        my.vmi.isLoading(true);
+                        my.vmi.symbolTitle(res['Meta Data']['2. Symbol'].toUpperCase());
+                        my.vmi.createDailyPriceObservableAry(res['Time Series (Daily)']);
+                    }).then(() => {
+                        my.vmi.isLoading(false)
+                    })
                     }
-                },
-                this.searchTicker = function() {
-                    let url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${this.inputTicker()}&apikey=TLLLXNFNDTE63G5H`;
-                    $.get(url, (res) => {
-                    my.vmi.isLoading(true);
-                    my.vmi.symbolTitle(res['Meta Data']['2. Symbol'].toUpperCase());
-                    my.vmi.createDailyPriceObservableAry(res['Time Series (Daily)']);
-                }).then(() => {
-                    my.vmi.isLoading(false)
-                })
-                }
+                return {
+                    title: title,
+                    userFullName: userFullName,
+                    inputTicker: inputTicker,
+                    data: data,
+                    isLoading: isLoading,
+                    symbolTitle: symbolTitle,
+                    sampleData, sampleData,
+                    tickers: tickers,
+                    selectedTicker: selectedTicker,
+                    url: url,
+                    createDailyPriceObservableAry: createDailyPriceObservableAry,
+                    searchTicker: searchTicker
+                };
             };
 
             my.dailyPrice = function(date, high, low, open, close, volume) {
@@ -88,6 +101,7 @@
             // =================================================== Observables' Subscriptions ===================================================
 
             my.vmi.selectedTicker.subscribe(() =>{
+                console.log('sub notice');
                 $.get(my.vmi.url(), (res) => {
                     my.vmi.isLoading(true);
                     my.vmi.createDailyPriceObservableAry(res['Time Series (Daily)']);
@@ -149,9 +163,6 @@
         </div>
     </div>
 
-    <!-- <div data-bind="text: ko.toJSON($root.sampleData)"> -->
-
-
 
     <div class="d-flex justify-content-center" data-bind="if: isLoading">
         <div class="spinner-border" role="status">
@@ -159,7 +170,11 @@
         </div>
     </div>
 
-    <script src="../custom-high-chart.js"></script>
+    <!-- DEBUG -->
+    <div data-bind="text: ko.toJSON(selectedTicker)">
+
+    <!-- HighChart -->
+    <!-- <script src="../custom-high-chart.js"></script> -->
 
 </body>
 </html>
