@@ -27,7 +27,7 @@
                 {id: 5, symbol: 'SOFI'}];
                 this.selectedTicker = ko.observable(this.tickers[0]);
                 this.url = ko.computed(() => {
-                    return `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${this.selectedTicker().symbol}&apikey=${process.env.alphavantageApi}`
+                    return `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${this.selectedTicker().symbol}&apikey=TLLLXNFNDTE63G5H`
                 }, this);
                 this.createDailyPriceObservableAry = function(data) {
 
@@ -42,7 +42,7 @@
                     }
                 },
                 this.searchTicker = function() {
-                    let url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${this.inputTicker()}&apikey=${process.env.alphavantageApi}`;
+                    let url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${this.inputTicker()}&apikey=TLLLXNFNDTE63G5H`;
                     $.get(url, (res) => {
                     my.vmi.isLoading(true);
                     my.vmi.symbolTitle(res['Meta Data']['2. Symbol'].toUpperCase());
@@ -69,7 +69,7 @@
             my.vmi = new my.vm('exclusive daily');
 
             // =================================================== initial data ===================================================
-            const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${my.vmi.selectedTicker().symbol}&apikey=${process.env.alphavantageApi}`;
+            const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${my.vmi.selectedTicker().symbol}&apikey=TLLLXNFNDTE63G5H`;
             $.get(url, (res) => {
                 console.log(res);
                 my.vmi.isLoading(true);
