@@ -1,7 +1,3 @@
 {
-    "root": "public_html",
-    "routes": {
-        "/*.html": "index.html",
-        "/scripts/*.js": "main.js"
-      }
+    "root": "public_html"
 }
