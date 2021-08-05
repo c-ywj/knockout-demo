@@ -1,7 +1,6 @@
 var my = my || {};
 
 my.dataService = (function(){
-    console.log('dataService init');
     var getSampleData = function () {
         return my.sampleData;
     }
@@ -12,7 +11,6 @@ my.dataService = (function(){
 })(my)
 
 my.sampleData = (function (my) {
-    console.log('sampleData init');
     var data = {
         sampleKey: 'sampleText'
     };
